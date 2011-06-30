@@ -104,4 +104,16 @@ public class Tag {
     public String getName() {
         return name;
     }
+
+    public String getImplicitTag() {
+        return implicitTag;
+    }
+
+    public boolean isSelfClosing() {
+        return selfClosing;
+    }
+
+    public boolean isDiscardable() {
+        return discardable;
+    }
 }

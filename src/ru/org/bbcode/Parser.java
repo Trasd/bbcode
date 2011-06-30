@@ -1,8 +1,10 @@
 package ru.org.bbcode;
 
+import ru.org.bbcode.nodes.*;
 import ru.org.bbcode.tags.*;
 
 import java.util.*;
+import java.util.regex.Matcher;
 
 /**
  * Created by IntelliJ IDEA.
@@ -160,11 +162,6 @@ public class Parser {
         return tagNames;
     }
 
-
-    public Parser(){
-
-    }
-
     private static Set<String> initInlineTags(){
         Set<String> tags = new HashSet<String>();
         tags.add("b");
@@ -206,5 +203,117 @@ public class Parser {
         tags.add("url");
         return tags;
     }
+
+    protected boolean rootAllowsInline;
+    protected Node currentNode;
+    protected Node rootNode;
+
+    public Parser(boolean rootAllowsInline){
+        this.rootAllowsInline = rootAllowsInline;
+    }
+
+    public Parser(){
+        this.rootAllowsInline = false;
+    }
+
+    void pushTextNode(String text, boolean escaped){
+        String textClass;
+        if(currentNode.allows("text")){
+            if(text.trim().length() == 0){
+                if(escaped){
+                    currentNode.getChildren().add(new EscapedTextNode(currentNode, text));
+                }else{
+                    currentNode.getChildren().add(new TextNode(currentNode, text));
+                }
+            }else{
+                if(currentNode.allows("div")){
+                    currentNode.getChildren().add(new TagNode(currentNode,"div", ""));
+                    descend();
+                }else{
+                    ascend();
+                }
+                pushTextNode(text, false);
+            }
+        }else{
+            if(escaped){
+                currentNode.getChildren().add(new EscapedTextNode(currentNode,text));
+            }else{
+                currentNode.getChildren().add(new TextNode(currentNode,text));
+            }
+        }
+    }
+
+    void descend(){
+        currentNode = currentNode.getChildren().remove(currentNode.getChildren().size());
+    }
+
+    void ascend(){
+        currentNode = currentNode.getParent();
+
+    }
+
+    void pushTagNode(String name, String parameter){
+        TagNode tagCurrentNode = (TagNode)currentNode;
+        if(!currentNode.allows(name)){
+            Tag newTag = TAG_DICT.get(name);
+            if(newTag.isDiscardable()){
+                return;
+            }else if(currentNode == rootNode || BLOCK_LEVEL_TAGS.contains(tagCurrentNode.getBbtag().getName()) && newTag.getImplicitTag() != null){
+                pushTagNode(newTag.getImplicitTag(), "");
+                pushTagNode(name, parameter);
+            }else{
+                currentNode = currentNode.getParent();
+                pushTagNode(name, parameter);
+            }
+        }else{
+            TagNode node = new TagNode(currentNode, name, parameter);
+            currentNode.getChildren().add(node);
+            if(!node.getBbtag().isSelfClosing()){
+                descend();
+            }
+        }
+    }
+
+    void closeTagNode(String name){
+        Node tempNode = currentNode;
+        while (true){
+            if(tempNode == rootNode){
+                break;
+            }
+            if(TagNode.class.isInstance(tempNode)){
+                TagNode node = (TagNode)tempNode;
+                if(node.getBbtag().getName().equals(name)){
+                    currentNode = tempNode;
+                    ascend();
+                    break;
+                }
+            }
+            tempNode = tempNode.getParent();
+        }
+    }
+
+    protected String prepare(String bbcode){
+        return bbcode.replaceAll("\r\n", "\n").replaceAll("\n", "[softbr]");
+    }
+
+    public void parse(String rawbbcode){
+        rootNode = new RootNode(rootAllowsInline);
+        currentNode = rootNode;
+        String bbcode = prepare(rawbbcode);
+        int pos = 0;
+        while(pos<bbcode.length()){
+            String subbbcode = bbcode.substring(pos);
+            Matcher match = Tag.BBTAG_REGEXP.matcher(subbbcode);
+            if(match.find()){
+                pushTextNode(bbcode.substring(pos,match.start()), false);
+                String tagname = match.group(0);
+                String parameter = match.group(1);
+                String wholematch = match.group(); // wrong? :-(
+            }
+
+        }
+
+    }
+
 
 }

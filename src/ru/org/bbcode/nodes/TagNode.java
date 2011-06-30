@@ -38,6 +38,10 @@ public class TagNode extends Node{
         }
     }
 
+    public Tag getBbtag() {
+        return bbtag;
+    }
+
     public String renderXHtml(){
         return bbtag.renderNodeXhtml(this);
     }

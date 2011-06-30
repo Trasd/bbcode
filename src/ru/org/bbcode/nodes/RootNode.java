@@ -11,12 +11,7 @@ import ru.org.bbcode.Parser;
 public class RootNode extends Node{
     protected boolean allowInline;
 
-    public RootNode(Node node){
-        super(node);
-    }
-
-    public RootNode(Node node, boolean allowInline){
-        super(node);
+    public RootNode(boolean allowInline){
         this.allowInline = allowInline;
     }
 

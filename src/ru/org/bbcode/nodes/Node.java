@@ -14,6 +14,10 @@ public class Node {
     protected List<Node> children;
     protected String parameter;
 
+    public Node(){
+        children = new ArrayList<Node>();
+    }
+
     public Node(Node parent){
         this.parent = parent;
         children = new ArrayList<Node>();
