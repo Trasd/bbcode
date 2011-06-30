@@ -28,6 +28,10 @@ public class Node {
         return false;
     }
 
+    public boolean prohibited(String tagname){
+        return false;
+    }
+
     public int lengthChildren(){
         return children.size();
     }

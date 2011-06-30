@@ -8,7 +8,7 @@ package ru.org.bbcode.nodes;
  * To change this template use File | Settings | File Templates.
  */
 public class TextNode extends Node {
-    private String text;
+    protected String text;
 
     public TextNode(Node parent, String text){
         super(parent);

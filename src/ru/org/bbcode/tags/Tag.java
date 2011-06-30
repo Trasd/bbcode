@@ -93,6 +93,14 @@ public class Tag {
         return render.toString();
     }
 
+    public Set<String> getAllowedChildren() {
+        return allowedChildren;
+    }
+
+    public Set<String> getProhibitedElements() {
+        return prohibitedElements;
+    }
+
     public String getName() {
         return name;
     }

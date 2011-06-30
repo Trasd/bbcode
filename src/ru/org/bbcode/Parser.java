@@ -18,12 +18,12 @@ public class Parser {
     public static Set<String> OTHER_TAGS = initOtherTags();
     public static Set<String> ANCHOR_TAGS = initAnchorTags();
 
-    private List<Tag> tags;
-    private Map<String,Tag> tagDict;
-    private Set<String> tagNames;
+    public static List<Tag> TAGS = initTags();
+    public static Map<String,Tag> TAG_DICT = initTagDict();
+    public static Set<String> TAG_NAMES = initTagNames();
 
-    public Parser(){
-        tags = new ArrayList<Tag>();
+    private static List<Tag> initTags(){
+        List<Tag> tags = new ArrayList<Tag>();
         // <br/>
         {
             Set<String> children = new HashSet<String>();
@@ -139,16 +139,29 @@ public class Parser {
                     .build("*", FLOW_TAGS, "list");
             tags.add(tag);
         }
+        return tags;
+    }
 
-        tagDict = new HashMap<String, Tag>();
-        tagNames = new HashSet<String>();
-
-        for(Tag tag : tags){
+    public static Map<String,Tag> initTagDict(){
+        Map<String,Tag> tagDict = new HashMap<String, Tag>();
+        for(Tag tag : initTags()){
             if(!"text".equals(tag.getName())){
                 tagDict.put(tag.getName(), tag);
             }
+        }
+        return tagDict;
+    }
+
+    public static Set<String> initTagNames(){
+        Set<String> tagNames = new HashSet<String>();
+        for(Tag tag : initTags()){
             tagNames.add(tag.getName());
         }
+        return tagNames;
+    }
+
+
+    public Parser(){
 
     }
 
