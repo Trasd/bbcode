@@ -1,0 +1,3 @@
+Попытка переписать bbcode parser Люка Планта с python на java.
+Исходный код python версии взят у Ивана Сагалаева(http://http://softwaremaniacs.org)
+http://bazaar.launchpad.net/~isagalaev/+junk/cicero/view/head:/filters/bbcode.py
