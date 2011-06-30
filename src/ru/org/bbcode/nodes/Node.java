@@ -9,17 +9,17 @@ import java.util.List;
  * Date: 6/29/11
  * Time: 11:49 PM
 */
-public class BBNode {
-    protected BBNode parent;
-    protected List<BBNode> children;
+public class Node {
+    protected Node parent;
+    protected List<Node> children;
     protected String parameter;
 
-    public BBNode(BBNode parent){
+    public Node(Node parent){
         this.parent = parent;
-        children = new ArrayList<BBNode>();
+        children = new ArrayList<Node>();
     }
 
-    public BBNode getParent(){
+    public Node getParent(){
         return parent;
     }
 
@@ -32,7 +32,7 @@ public class BBNode {
         return children.size();
     }
 
-    public List<BBNode> getChildren(){
+    public List<Node> getChildren(){
         return children;
     }
 
@@ -59,9 +59,9 @@ public class BBNode {
     }
 
     public String renderChildrenXHtml(){
-        List<BBNode> stripChildren = stripOutsideBrs(children);
+        List<Node> stripChildren = stripOutsideBrs(children);
         StringBuilder stringBuilder = new StringBuilder();
-        for( BBNode child : stripChildren){
+        for( Node child : stripChildren){
             stringBuilder.append(child.renderXHtml());
         }
         return stringBuilder.toString();
@@ -69,14 +69,14 @@ public class BBNode {
 
     public String renderChildrenBBCode(){
         StringBuilder stringBuilder = new StringBuilder();
-        for( BBNode child : children){
+        for( Node child : children){
             stringBuilder.append(child.renderBBCode());
         }
         return stringBuilder.toString();
 
     }
 
-    public static List<BBNode> stripOutsideBrs(List<BBNode> childs){
-        return new ArrayList<BBNode>();
+    public static List<Node> stripOutsideBrs(List<Node> children){
+        return new ArrayList<Node>();
     }
 }

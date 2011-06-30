@@ -1,6 +1,6 @@
 package ru.org.bbcode.tags;
 
-import ru.org.bbcode.nodes.BBNode;
+import ru.org.bbcode.nodes.Node;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -12,11 +12,11 @@ import java.util.Set;
  * Date: 6/30/11
  * Time: 10:40 AM
  */
-public class HtmlEquivTag extends BBTag {
+public class HtmlEquivTag extends Tag {
     protected String htmlEquiv;
     protected Map<String, String> attributes;
 
-    public static class Builder extends BBTag.Builder{
+    public static class Builder extends Tag.Builder{
         protected String htmlEquiv;
         protected Map<String,String> attributes;
 
@@ -44,7 +44,7 @@ public class HtmlEquivTag extends BBTag {
         attributes = builder.attributes;
     }
 
-    public String renderNodeXhtml(BBNode node){
+    public String renderNodeXhtml(Node node){
         StringBuilder opening = new StringBuilder(htmlEquiv);
         StringBuilder ret = new StringBuilder();
         if(attributes != null){

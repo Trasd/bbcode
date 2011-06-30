@@ -1,8 +1,9 @@
 package ru.org.bbcode.tags;
 
-import ru.org.bbcode.nodes.BBNode;
+import ru.org.bbcode.nodes.Node;
 
 import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * Created by IntelliJ IDEA.
@@ -10,7 +11,7 @@ import java.util.Set;
  * Date: 6/29/11
  * Time: 11:20 PM
  */
-public class BBTag {
+public class Tag {
     protected String name;
     protected Set<String> allowedChildren;
     protected String implicitTag;
@@ -18,14 +19,17 @@ public class BBTag {
     protected Set<String> prohibitedElements;
     protected boolean discardable=false;
 
+    public static final Pattern MEMBER_REGEXP = Pattern.compile("^['\"]([0-9A-Za-z_]{1,30})['\"]$");
+    public static final Pattern BBTAG_REGEXP = Pattern.compile("\\[\\[?/?([A-Za-z\\*]+)(:[a-f0-9]+)?(=[^\\]]+)?\\]?\\]");
+
     public static class Builder{
 
         protected boolean selfClosing=false;
         protected Set<String> prohibitedElements;
         protected boolean discardable=false;
 
-        public BBTag build(String name, Set<String> allowedChildren, String implicitTag){
-            return new BBTag(name, allowedChildren, implicitTag);
+        public Tag build(String name, Set<String> allowedChildren, String implicitTag){
+            return new Tag(name, allowedChildren, implicitTag);
         }
 
         public Builder setSelfClosing(boolean selfClosing) {
@@ -44,7 +48,7 @@ public class BBTag {
         }
     }
 
-    public BBTag(String name, Set<String> allowedChildren, String implicitTag){
+    public Tag(String name, Set<String> allowedChildren, String implicitTag){
         this.name = name;
         this.implicitTag = implicitTag;
         this.allowedChildren = allowedChildren;
@@ -54,19 +58,19 @@ public class BBTag {
         return new Builder();
     }
 
-    protected BBTag(Builder builder){
+    protected Tag(Builder builder){
         selfClosing = builder.selfClosing;
         prohibitedElements = builder.prohibitedElements;
         discardable = builder.discardable;
     }
 
 
-    public String renderNodeXhtml(BBNode node){
+    public String renderNodeXhtml(Node node){
         assert false;
         return "exception!11";
     }
 
-    public String renderNodeBBCode(BBNode node){
+    public String renderNodeBBCode(Node node){
         StringBuilder opening = new StringBuilder(name);
         StringBuilder render = new StringBuilder();
         if(node.isParameter()){
