@@ -34,6 +34,10 @@ public class HtmlEquivTag extends Tag {
         }
     }
 
+    public static Builder builder(){
+        return new Builder();
+    }
+
     public HtmlEquivTag(String name, Set<String> allowedChildren, String implicitTag){
         super(name, allowedChildren, implicitTag);
     }

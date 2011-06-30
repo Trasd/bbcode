@@ -92,4 +92,8 @@ public class Tag {
         }
         return render.toString();
     }
+
+    public String getName() {
+        return name;
+    }
 }
