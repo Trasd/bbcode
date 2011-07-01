@@ -1,12 +1,11 @@
 package ru.org.bbcode;
 
-import com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel;
-import com.sun.org.apache.xpath.internal.operations.And;
 import ru.org.bbcode.nodes.*;
 import ru.org.bbcode.tags.*;
 
 import java.util.*;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by IntelliJ IDEA.
@@ -16,195 +15,152 @@ import java.util.regex.Matcher;
  */
 public class Parser {
 
-    public static Set<String> INLINE_TAGS = initInlineTags();
-    public static Set<String> BLOCK_LEVEL_TAGS = initBlockLevelTags();
-    public static Set<String> FLOW_TAGS = initFlowTags();
-    public static Set<String> OTHER_TAGS = initOtherTags();
-    public static Set<String> ANCHOR_TAGS = initAnchorTags();
+    public static Set<String> INLINE_TAGS;
+    public static Set<String> BLOCK_LEVEL_TAGS;
+    public static Set<String> FLOW_TAGS;
+    public static Set<String> OTHER_TAGS;
+    public static Set<String> ANCHOR_TAGS;
 
-    public static List<Tag> TAGS = initTags();
-    public static Map<String,Tag> TAG_DICT = initTagDict();
-    public static Set<String> TAG_NAMES = initTagNames();
+    public static List<Tag> TAGS;
+    public static Map<String,Tag> TAG_DICT;
+    public static Set<String> TAG_NAMES;
+    public static final Pattern MEMBER_REGEXP = Pattern.compile("^['\"]([0-9A-Za-z_]{1,30})['\"]$");
+//    public static final Pattern BBTAG_REGEXP = Pattern.compile("\\[\\[?/?([A-Za-z\\*]+)(:[a-f0-9]+)?(=[^\\]]+)?\\]?\\]");
+    public static final Pattern BBTAG_REGEXP = Pattern.compile("\\[\\[?\\/?([A-Za-z\\*]+)(=[^\\]]+)?\\]?\\]");
 
-    private static List<Tag> initTags(){
-        List<Tag> tags = new ArrayList<Tag>();
-        // <br/>
-        {
-            Set<String> children = new HashSet<String>();
-            Tag tag = HtmlEquivTag.builder()
-                    .setHtmlEquiv("<br>")
-                    .setSelfClosing(true)
-                    .setDiscardable(true)
-                    .build("br", children, "div");
+    static{
+        INLINE_TAGS = new HashSet<String>();
+        INLINE_TAGS.add("b");
+        INLINE_TAGS.add("i");
+        INLINE_TAGS.add("url");
+        INLINE_TAGS.add("br");
+        INLINE_TAGS.add("text");
+        INLINE_TAGS.add("img");
+        INLINE_TAGS.add("softbr");
 
-            tags.add(tag);
+        BLOCK_LEVEL_TAGS = new HashSet<String>();
+        BLOCK_LEVEL_TAGS.add("p");
+        BLOCK_LEVEL_TAGS.add("quote");
+        BLOCK_LEVEL_TAGS.add("list");
+        BLOCK_LEVEL_TAGS.add("pre");
+        BLOCK_LEVEL_TAGS.add("code");
+        BLOCK_LEVEL_TAGS.add("div");
+
+        FLOW_TAGS = new HashSet<String>();
+        FLOW_TAGS.addAll(INLINE_TAGS);
+        FLOW_TAGS.addAll(BLOCK_LEVEL_TAGS);
+
+        OTHER_TAGS = new HashSet<String>();
+        OTHER_TAGS.add("*");
+
+        ANCHOR_TAGS = new HashSet<String>();
+        ANCHOR_TAGS.add("url");
+
+        TAGS = new ArrayList<Tag>();
+        { // <br/>
+            HtmlEquivTag tag = new HtmlEquivTag("br", new HashSet<String>(), "div");
+            tag.setSelfClosing(true);
+            tag.setDiscardable(true);
+            tag.setHtmlEquiv("br");
+            TAGS.add(tag);
         }
-        // <br/>, but can adapt during render ?
-        {
+        { // <br/>, but can adapt during render ?
             Set<String> children = new HashSet<String>();
-            Tag tag = SoftBrTag.builder()
-                    .setSelfClosing(true)
-                    .setDiscardable(true)
-                    .build("softbr", children, "div");
-            tags.add(tag);
+            SoftBrTag tag = new SoftBrTag("softbr", children, "div");
+            tag.setSelfClosing(true);
+            tag.setDiscardable(true);
+            TAGS.add(tag);
         }
-        // <b>
-        {
-            Tag tag = HtmlEquivTag.builder()
-                    .setHtmlEquiv("b")
-                    .build("b", INLINE_TAGS, "div");
-            tags.add(tag);
+        { // <b>
+            HtmlEquivTag tag = new HtmlEquivTag("b", INLINE_TAGS, "div");
+            tag.setHtmlEquiv("b");
+            TAGS.add(tag);
         }
-        // <img/>
-        {
-            Tag tag = ImgTag.builder()
-                    .build("img", INLINE_TAGS, "div");
-            tags.add(tag);
+        { // <i>
+            HtmlEquivTag tag = new HtmlEquivTag("i", INLINE_TAGS, "div");
+            tag.setHtmlEquiv("i");
+            TAGS.add(tag);
         }
-        // <i>
-        {
-            Tag tag = HtmlEquivTag.builder()
-                    .setHtmlEquiv("i")
-                    .build("i", INLINE_TAGS, "div");
-            tags.add(tag);
+        { // <a>
+            Set<String> el = new HashSet<String>();
+            el.add("text");
+            UrlTag tag = new UrlTag("url", el, "div");
+            TAGS.add(tag);
         }
-        // <a>
-        {
-            Set<String> children = new HashSet<String>();
-            children.add("text");
-            Tag tag = UrlTag.builder()
-                    .build("url", children , "div");
-            tags.add(tag);
+        { // <p>
+            HtmlEquivTag tag = new HtmlEquivTag("p", INLINE_TAGS, null);
+            tag.setHtmlEquiv("p");
+            TAGS.add(tag);
         }
-        // <p>
-        {
-            Tag tag = HtmlEquivTag.builder()
-                    .setHtmlEquiv("p")
-                    .build("p", INLINE_TAGS, null);
-            tags.add(tag);
+        { // <div>
+            HtmlEquivTag tag = new HtmlEquivTag("div", FLOW_TAGS, null);
+            tag.setHtmlEquiv("div");
+            TAGS.add(tag);
         }
-        // <div>
-        {
-            Tag tag = HtmlEquivTag.builder()
-                    .setHtmlEquiv("div")
-                    .build("div", FLOW_TAGS, null);
-            tags.add(tag);
+        { // <blockquote>
+            Set<String> el = new HashSet<String>();
+            el.addAll(BLOCK_LEVEL_TAGS);
+            el.add("softbr");
+            QuoteTag tag = new QuoteTag("quote", el, "div");
+            TAGS.add(tag);
         }
-        // <blockquote>
-        {
-            Set<String> children = new HashSet<String>();
-            children.add("softbr");
-            children.addAll(BLOCK_LEVEL_TAGS);
-            Tag tag = QuoteTag.builder()
-                    .build("quote", children, "div");
-            tags.add(tag);
+        { // <ul>
+            Set<String> el = new HashSet<String>();
+            el.add("*");
+            el.add("softbr");
+            HtmlEquivTag tag = new HtmlEquivTag("list", el, null);
+            tag.setHtmlEquiv("ul");
+            TAGS.add(tag);
         }
-        // <ul>
-        {
-            Set<String> children = new HashSet<String>();
-            children.add("softbr");
-            children.add("*");
-            Tag tag = HtmlEquivTag.builder()
-                    .setHtmlEquiv("ul")
-                    .build("list", children, null);
-            tags.add(tag);
-        }
-        // <pre> (only img currently needed out of the prohibited elements)
-        {
+        { // <pre> (only img currently needed out of the prohibited elements)
             Set<String> elements = new HashSet<String>();
             elements.add("img");
             elements.add("big");
             elements.add("small");
             elements.add("sub");
             elements.add("sup");
-            Tag tag = HtmlEquivTag.builder()
-                    .setHtmlEquiv("pre")
-                    .setProhibitedElements(elements)
-                    .build("pre", INLINE_TAGS, null);
-            tags.add(tag);
+            HtmlEquivTag tag = new HtmlEquivTag("pre", INLINE_TAGS, null);
+            tag.setHtmlEquiv("pre");
+            tag.setProhibitedElements(elements);
+            TAGS.add(tag);
         }
-        // <pre class="code">
-        {
+        { // <pre class="code">
             Set<String> elements = new HashSet<String>();
             elements.add("img");
             elements.add("big");
             elements.add("small");
             elements.add("sub");
             elements.add("sup");
-            Tag tag = CodeTag.builder()
-                    .setProhibitedElements(elements)
-                    .build("code", INLINE_TAGS, null);
-            tags.add(tag);
+            CodeTag tag = new CodeTag("code", INLINE_TAGS, null);
+            tag.setProhibitedElements(elements);
+            TAGS.add(tag);
         }
-        // <li>
-        {
-            Tag tag = HtmlEquivTag.builder()
-                    .setHtmlEquiv("li")
-                    .build("*", FLOW_TAGS, "list");
-            tags.add(tag);
+        { //  <li>
+            LiTag tag = new LiTag("*", FLOW_TAGS, "list");
+            TAGS.add(tag);
         }
-        return tags;
-    }
 
-    public static Map<String,Tag> initTagDict(){
-        Map<String,Tag> tagDict = new HashMap<String, Tag>();
-        for(Tag tag : initTags()){
+        TAG_DICT = new HashMap<String, Tag>();
+        for(Tag tag : TAGS){
             if(!"text".equals(tag.getName())){
-                tagDict.put(tag.getName(), tag);
+                TAG_DICT.put(tag.getName(), tag);
             }
         }
-        return tagDict;
-    }
-
-    public static Set<String> initTagNames(){
-        Set<String> tagNames = new HashSet<String>();
-        for(Tag tag : initTags()){
-            tagNames.add(tag.getName());
+        TAG_NAMES = new HashSet<String>();
+        for(Tag tag : TAGS){
+            TAG_NAMES.add(tag.getName());
         }
-        return tagNames;
     }
 
-    private static Set<String> initInlineTags(){
-        Set<String> tags = new HashSet<String>();
-        tags.add("b");
-        tags.add("i");
-        tags.add("url");
-        tags.add("br");
-        tags.add("text");
-        tags.add("img");
-        tags.add("softbr");
-        return tags;
+    public static String escape(String html){
+        return html
+                .replace("&", "&amp;")
+                .replace("<","&lt;")
+                .replace(">","&gt;")
+                .replace("\"", "&quot;");
     }
 
-    private static Set<String> initBlockLevelTags(){
-        Set<String> tags = new HashSet<String>();
-        tags.add("p");
-        tags.add("quote");
-        tags.add("list");
-        tags.add("pre");
-        tags.add("code");
-        tags.add("div");
-        return tags;
-    }
 
-    private static Set<String> initFlowTags(){
-        Set<String> tags = new HashSet<String>();
-        tags.addAll(initInlineTags());
-        tags.addAll(initBlockLevelTags());
-        return tags;
-    }
-
-    private static Set<String> initOtherTags(){
-        Set<String> tags = new HashSet<String>();
-        tags.add("*");
-        return tags;
-    }
-
-    private static Set<String> initAnchorTags(){
-        Set<String> tags = new HashSet<String>();
-        tags.add("url");
-        return tags;
-    }
 
     protected boolean rootAllowsInline;
     protected Node currentNode;
@@ -219,7 +175,7 @@ public class Parser {
     }
 
     void pushTextNode(String text, boolean escaped){
-        String textClass;
+
         if(!currentNode.allows("text")){
             if(text.trim().length() == 0){
                 if(escaped){
@@ -246,7 +202,7 @@ public class Parser {
     }
 
     void descend(){
-        currentNode = currentNode.getChildren().remove(currentNode.getChildren().size()-1);
+        currentNode = currentNode.getChildren().get(currentNode.getChildren().size()-1);
     }
 
     void ascend(){
@@ -303,11 +259,11 @@ public class Parser {
         String bbcode = prepare(rawbbcode);
         int pos = 0;
         while(pos<bbcode.length()){
-            Matcher match = Tag.BBTAG_REGEXP.matcher(bbcode).region(pos,bbcode.length());
+            Matcher match = BBTAG_REGEXP.matcher(bbcode).region(pos,bbcode.length());
             if(match.find()){
                 pushTextNode(bbcode.substring(pos,match.start()), false);
                 String tagname = match.group(1);
-                String parameter = match.group(3);
+                String parameter = match.group(2);
                 String wholematch = match.group(0);
 
                 if(wholematch.startsWith("[[") && wholematch.endsWith("]]")){

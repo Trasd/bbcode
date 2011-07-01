@@ -1,5 +1,6 @@
 package ru.org.bbcode.tags;
 
+import ru.org.bbcode.Parser;
 import ru.org.bbcode.nodes.Node;
 
 import java.util.Set;
@@ -22,7 +23,7 @@ public class QuoteTag extends Tag {
         }else{
             node.setParameter(node.getParameter().trim());
         }
-        Matcher match = MEMBER_REGEXP.matcher(node.getParameter());
+        Matcher match = Parser.MEMBER_REGEXP.matcher(node.getParameter());
         if(match.find()){
             String memberName = node.getParameter().substring(match.start(), match.end());
             ret.append("<p class=\"cite\"><cite>");

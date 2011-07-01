@@ -1,5 +1,6 @@
 package ru.org.bbcode.tags;
 
+import ru.org.bbcode.Parser;
 import ru.org.bbcode.nodes.Node;
 import ru.org.bbcode.nodes.TextNode;
 
@@ -29,14 +30,13 @@ public class UrlTag extends Tag {
         }
         String linkText = txtNode.getText().trim();
         if(url.length() != 0){
-            ret.append("<a rel=\"nofollow\" href=\"");
-            ret.append(url); // TODO need escape
+            ret.append("<a href=\"");
+            ret.append(Parser.escape(url));
             ret.append("\">");
-            ret.append(linkText); //TODO need escape
+            ret.append(Parser.escape(linkText));
             ret.append("</a>");
         }
         return ret.toString();
-
     }
 
 }

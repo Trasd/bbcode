@@ -1,5 +1,7 @@
 package ru.org.bbcode.nodes;
 
+import ru.org.bbcode.Parser;
+
 /**
  * Created by IntelliJ IDEA.
  * User: hizel
@@ -15,16 +17,12 @@ public class TextNode extends Node {
         this.text = text;
     }
 
-    public void setText(String text) {
-        this.text = text;
-    }
-
     public String getText() {
         return text;
     }
 
     public String renderXHtml(){
-        return text; // TODO need escape
+        return Parser.escape(text);
     }
 
     public String renderBBCode(){

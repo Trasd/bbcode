@@ -1,5 +1,6 @@
 package ru.org.bbcode.tags;
 
+import ru.org.bbcode.Parser;
 import ru.org.bbcode.nodes.Node;
 
 import java.util.Iterator;
@@ -16,36 +17,16 @@ public class HtmlEquivTag extends Tag {
     protected String htmlEquiv;
     protected Map<String, String> attributes;
 
-    public static class Builder extends Tag.Builder{
-        protected String htmlEquiv;
-        protected Map<String,String> attributes;
-
-        public Builder setHtmlEquiv(String htmlEquiv) {
-            this.htmlEquiv = htmlEquiv;
-            return this;
-        }
-
-        public Builder setAttributes(Map<String, String> attributes) {
-            this.attributes = attributes;
-            return this;
-        }
-        public HtmlEquivTag build(String name, Set<String> allowedChildren, String implicitTag){
-            return new HtmlEquivTag(name, allowedChildren, implicitTag);
-        }
-    }
-
-    public static Builder builder(){
-        return new Builder();
-    }
-
     public HtmlEquivTag(String name, Set<String> allowedChildren, String implicitTag){
         super(name, allowedChildren, implicitTag);
     }
 
-    protected HtmlEquivTag(Builder builder){
-        super(builder);
-        htmlEquiv = builder.htmlEquiv;
-        attributes = builder.attributes;
+    public void setHtmlEquiv(String htmlEquiv) {
+        this.htmlEquiv = htmlEquiv;
+    }
+
+    public void setAttributes(Map<String, String> attributes) {
+        this.attributes = attributes;
     }
 
     public String renderNodeXhtml(Node node){
@@ -60,7 +41,7 @@ public class HtmlEquivTag extends Tag {
                 String value = entry.getValue();
                 opening.append(key);
                 opening.append('=');
-                opening.append(value); // TODO need escape value
+                opening.append(Parser.escape(value));
                 opening.append(' ');
             }
         }
@@ -72,9 +53,17 @@ public class HtmlEquivTag extends Tag {
                 ret.append('<').append(opening).append('>');
                 ret.append(node.renderChildrenXHtml());
                 ret.append('<').append(htmlEquiv).append('>');
-            } // TODO else ret null ?
+            }
         }
         return ret.toString();
+    }
+
+    public String renderNodeBBCode(Node node){
+        if("div".equals(name)){
+            return node.renderChildrenBBCode();
+        }else{
+            return super.renderNodeBBCode(node);
+        }
     }
 
 }

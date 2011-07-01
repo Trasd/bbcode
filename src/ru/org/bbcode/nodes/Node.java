@@ -1,9 +1,5 @@
 package ru.org.bbcode.nodes;
 
-import ru.org.bbcode.tags.CodeTag;
-import ru.org.bbcode.tags.QuoteTag;
-
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,9 +67,8 @@ public class Node {
     }
 
     public String renderChildrenXHtml(){
-        List<Node> stripChildren = stripOutsideBrs(children);
         StringBuilder stringBuilder = new StringBuilder();
-        for( Node child : stripChildren){
+        for( Node child : children){
             stringBuilder.append(child.renderXHtml());
         }
         return stringBuilder.toString();
@@ -86,29 +81,5 @@ public class Node {
         }
         return stringBuilder.toString();
 
-    }
-
-    public List<Node> stripOutsideBrs(List<Node> nodes){
-
-/*        List<Node> ret = new ArrayList<Node>();
-        List<Node> blockNodes = new ArrayList<Node>();
-        List<Node> nonBlockNodes = new ArrayList<Node>();
-        for(Node node : nodes){
-            Class nodeClass = node.getClass();
-            Field bbtagField;
-            try{
-                bbtagField = nodeClass.getField("bbtag");
-                if(CodeTag.class == bbtagField.getType() || QuoteTag.class == bbtagField.getType()){
-                    blockNodes.add(node);
-                }
-            }catch (Exception ex){
-                Node stripNode = stripBr(node);
-                if(stripNode != null){
-                    nonBlockNodes.add(node);
-                }
-            }
-        } */
-
-        return nodes;
     }
 }

@@ -1,7 +1,5 @@
 package ru.org.bbcode;
 
-import java.io.Console;
-
 /**
  * Created by IntelliJ IDEA.
  * User: hizel
@@ -29,6 +27,7 @@ public class ParserUtil {
     public static void main(String[] args){
         String p = to_html("[b]ikiki[/b]");
         System.out.print(p.length());
+        System.out.print(p);
 /*        Console console = System.console();
 
         if (console == null) {

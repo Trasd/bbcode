@@ -12,6 +12,7 @@ public class RootNode extends Node{
     protected boolean allowInline;
 
     public RootNode(boolean allowInline){
+        super();
         this.allowInline = allowInline;
     }
 

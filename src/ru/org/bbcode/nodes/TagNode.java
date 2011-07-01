@@ -19,6 +19,18 @@ public class TagNode extends Node{
         this.parameter = parameter;
     }
 
+/*    private boolean hasattr(Node node){
+        Class[] cls = new Class[1];
+        cls[0] = String.class;
+        try{
+            Method meth = node.getClass().getMethod("prohibited", cls);
+        }catch (NoSuchMethodException e){
+            //node.getClass().getCanonicalName();
+            return false;
+        }
+        return true;
+    }*/
+
     public boolean prohibited(String tagName){
         if(bbtag.getProhibitedElements() != null && bbtag.getProhibitedElements().contains(tagName)){
             return true;
