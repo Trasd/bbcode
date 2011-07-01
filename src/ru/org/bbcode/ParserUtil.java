@@ -1,5 +1,8 @@
 package ru.org.bbcode;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+
 /**
  * Created by IntelliJ IDEA.
  * User: hizel
@@ -24,23 +27,21 @@ public class ParserUtil {
         return bb2xhtml(text, false);
     }
 
-    public static void main(String[] args){
-        String p = to_html("[b]ikiki[/b]");
-        System.out.print(p.length());
-        System.out.print(p);
-/*        Console console = System.console();
+    public static void main(String[] args) throws Exception{
+        BufferedReader console = new BufferedReader(new InputStreamReader(System.in));
+        String line;
+        System.out.print("> ");
+        while(null != (line=console.readLine())){
+            if("".equals(line.trim())){
+                break;
+            }
+            String html = bb2xhtml(line, false);
+            String bb = correct(line, false);
 
-        if (console == null) {
-            System.err.println("No console.");
-            System.exit(1);
+            System.out.println("html: "+html);
+            System.out.println("bbcode: "+bb);
+
+            System.out.print("> ");
         }
-        while (true){
-            String text = console.readLine("%nEnter your regex: ");
-            console.format("result:%s.%n", to_html(text));
-        }*/
-
     }
-
-
-
 }

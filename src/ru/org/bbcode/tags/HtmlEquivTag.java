@@ -52,7 +52,7 @@ public class HtmlEquivTag extends Tag {
             if(node.lengthChildren() > 0){
                 ret.append('<').append(opening).append('>');
                 ret.append(node.renderChildrenXHtml());
-                ret.append('<').append(htmlEquiv).append('>');
+                ret.append("</").append(htmlEquiv).append('>');
             }
         }
         return ret.toString();
