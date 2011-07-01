@@ -2,3 +2,5 @@ bbcode.iml
 bbcode.ipr
 bbcode.iws
 *~
+lib/*
+out/*

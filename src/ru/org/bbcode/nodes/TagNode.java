@@ -15,12 +15,12 @@ public class TagNode extends Node{
 
     public TagNode(Node node, String name, String parameter){
         super(node);
-        bbtag = Parser.TAG_DICT.get("name");
+        bbtag = Parser.TAG_DICT.get(name);
         this.parameter = parameter;
     }
 
     public boolean prohibited(String tagName){
-        if(bbtag.getProhibitedElements().contains(tagName)){
+        if(bbtag.getProhibitedElements() != null && bbtag.getProhibitedElements().contains(tagName)){
             return true;
         }else{
             if(parent == null){

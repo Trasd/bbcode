@@ -1,5 +1,7 @@
 package ru.org.bbcode;
 
+import com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel;
+import com.sun.org.apache.xpath.internal.operations.And;
 import ru.org.bbcode.nodes.*;
 import ru.org.bbcode.tags.*;
 
@@ -218,7 +220,7 @@ public class Parser {
 
     void pushTextNode(String text, boolean escaped){
         String textClass;
-        if(currentNode.allows("text")){
+        if(!currentNode.allows("text")){
             if(text.trim().length() == 0){
                 if(escaped){
                     currentNode.getChildren().add(new EscapedTextNode(currentNode, text));
@@ -244,7 +246,7 @@ public class Parser {
     }
 
     void descend(){
-        currentNode = currentNode.getChildren().remove(currentNode.getChildren().size());
+        currentNode = currentNode.getChildren().remove(currentNode.getChildren().size()-1);
     }
 
     void ascend(){
@@ -253,12 +255,11 @@ public class Parser {
     }
 
     void pushTagNode(String name, String parameter){
-        TagNode tagCurrentNode = (TagNode)currentNode;
         if(!currentNode.allows(name)){
             Tag newTag = TAG_DICT.get(name);
             if(newTag.isDiscardable()){
                 return;
-            }else if(currentNode == rootNode || BLOCK_LEVEL_TAGS.contains(tagCurrentNode.getBbtag().getName()) && newTag.getImplicitTag() != null){
+            }else if(currentNode == rootNode || BLOCK_LEVEL_TAGS.contains(((TagNode)currentNode).getBbtag().getName()) && newTag.getImplicitTag() != null){
                 pushTagNode(newTag.getImplicitTag(), "");
                 pushTagNode(name, parameter);
             }else{
@@ -302,17 +303,52 @@ public class Parser {
         String bbcode = prepare(rawbbcode);
         int pos = 0;
         while(pos<bbcode.length()){
-            String subbbcode = bbcode.substring(pos);
-            Matcher match = Tag.BBTAG_REGEXP.matcher(subbbcode);
+            Matcher match = Tag.BBTAG_REGEXP.matcher(bbcode).region(pos,bbcode.length());
             if(match.find()){
                 pushTextNode(bbcode.substring(pos,match.start()), false);
-                String tagname = match.group(0);
-                String parameter = match.group(1);
-                String wholematch = match.group(); // wrong? :-(
-            }
+                String tagname = match.group(1);
+                String parameter = match.group(3);
+                String wholematch = match.group(0);
 
+                if(wholematch.startsWith("[[") && wholematch.endsWith("]]")){
+                    pushTextNode(wholematch.substring(1,wholematch.length()-1), true);
+                }else{
+                    if(parameter != null && parameter.length() > 0){
+                        parameter = parameter.substring(1);
+                    }
+                    if(TAG_NAMES.contains(tagname)){
+                        if(wholematch.startsWith("[[")){
+                            pushTextNode("[", false);
+                        }
+
+                        if(wholematch.startsWith("[/")){
+                            closeTagNode(tagname);
+                        }else{
+                            pushTagNode(tagname, parameter);
+                        }
+
+                        if(wholematch.endsWith("]]")){
+                            pushTextNode("]", false);
+                        }
+                    }else{
+                        pushTextNode(wholematch, false);
+                    }
+                }
+                pos = match.end();
+            }else{
+                pushTextNode(bbcode.substring(pos),false);
+                pos = bbcode.length();
+            }
         }
 
+    }
+
+    public String renderXHtml(){
+        return rootNode.renderXHtml();
+    }
+
+    public String renderBBCode(){
+        return rootNode.renderBBCode();
     }
 
 

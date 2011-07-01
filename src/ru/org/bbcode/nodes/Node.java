@@ -1,5 +1,9 @@
 package ru.org.bbcode.nodes;
 
+import ru.org.bbcode.tags.CodeTag;
+import ru.org.bbcode.tags.QuoteTag;
+
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,7 +14,7 @@ import java.util.List;
  * Time: 11:49 PM
 */
 public class Node {
-    protected Node parent;
+    protected Node parent=null;
     protected List<Node> children;
     protected String parameter;
 
@@ -84,7 +88,27 @@ public class Node {
 
     }
 
-    public static List<Node> stripOutsideBrs(List<Node> children){
-        return new ArrayList<Node>();
+    public List<Node> stripOutsideBrs(List<Node> nodes){
+
+/*        List<Node> ret = new ArrayList<Node>();
+        List<Node> blockNodes = new ArrayList<Node>();
+        List<Node> nonBlockNodes = new ArrayList<Node>();
+        for(Node node : nodes){
+            Class nodeClass = node.getClass();
+            Field bbtagField;
+            try{
+                bbtagField = nodeClass.getField("bbtag");
+                if(CodeTag.class == bbtagField.getType() || QuoteTag.class == bbtagField.getType()){
+                    blockNodes.add(node);
+                }
+            }catch (Exception ex){
+                Node stripNode = stripBr(node);
+                if(stripNode != null){
+                    nonBlockNodes.add(node);
+                }
+            }
+        } */
+
+        return nodes;
     }
 }
