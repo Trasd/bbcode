@@ -23,11 +23,10 @@ public class QuoteTag extends Tag {
         }else{
             node.setParameter(node.getParameter().trim());
         }
-        Matcher match = Parser.MEMBER_REGEXP.matcher(node.getParameter());
-        if(match.find()){
-            String memberName = node.getParameter().substring(match.start(), match.end());
+
+        if(!node.getParameter().isEmpty()){
             ret.append("<p class=\"cite\"><cite>");
-            ret.append(memberName);
+            ret.append(Parser.escape(node.getParameter()));
             ret.append(":</cite></p>");
             ret.append("<blockquote>");
             ret.append(node.renderChildrenXHtml());

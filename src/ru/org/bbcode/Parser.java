@@ -33,6 +33,10 @@ public class Parser {
         INLINE_TAGS = new HashSet<String>();
         INLINE_TAGS.add("b");
         INLINE_TAGS.add("i");
+        INLINE_TAGS.add("u");
+        INLINE_TAGS.add("s");
+        INLINE_TAGS.add("em");
+        INLINE_TAGS.add("strong");
         INLINE_TAGS.add("url");
         INLINE_TAGS.add("br");
         INLINE_TAGS.add("text");
@@ -62,7 +66,7 @@ public class Parser {
         { // <br/>
             HtmlEquivTag tag = new HtmlEquivTag("br", new HashSet<String>(), "div");
             tag.setSelfClosing(true);
-            tag.setDiscardable(true);
+            //tag.setDiscardable(true);
             tag.setHtmlEquiv("br");
             TAGS.add(tag);
         }
@@ -81,6 +85,26 @@ public class Parser {
         { // <i>
             HtmlEquivTag tag = new HtmlEquivTag("i", INLINE_TAGS, "div");
             tag.setHtmlEquiv("i");
+            TAGS.add(tag);
+        }
+        { // <u> TODO Allert: The U tag has been deprecated in favor of the text-decoration style property.
+            HtmlEquivTag tag = new HtmlEquivTag("u", INLINE_TAGS, "div");
+            tag.setHtmlEquiv("u");
+            TAGS.add(tag);
+        }
+        { // <s> TODO Allert: The S tag has been deprecated in favor of the text-decoration style property.
+            HtmlEquivTag tag = new HtmlEquivTag("s", INLINE_TAGS, "div");
+            tag.setHtmlEquiv("s");
+            TAGS.add(tag);
+        }
+        { // <em>
+            HtmlEquivTag tag = new HtmlEquivTag("em", INLINE_TAGS, "div");
+            tag.setHtmlEquiv("em");
+            TAGS.add(tag);
+        }
+        { // <strong>
+            HtmlEquivTag tag = new HtmlEquivTag("strong", INLINE_TAGS, "div");
+            tag.setHtmlEquiv("strong");
             TAGS.add(tag);
         }
         { // <a>
