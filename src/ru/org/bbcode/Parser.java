@@ -133,6 +133,7 @@ public class Parser {
             elements.add("small");
             elements.add("sub");
             elements.add("sup");
+
             CodeTag tag = new CodeTag("code", INLINE_TAGS, null);
             tag.setProhibitedElements(elements);
             TAGS.add(tag);
@@ -275,8 +276,9 @@ public class Parser {
     public void parse(String rawbbcode){
         rootNode = new RootNode(rootAllowsInline);
         currentNode = rootNode;
-        String bbcode = prepare(rawbbcode);
+        String bbcode = rawbbcode;
         int pos = 0;
+        boolean isCode = false;
         while(pos<bbcode.length()){
             Matcher match = BBTAG_REGEXP.matcher(bbcode).region(pos,bbcode.length());
             if(match.find()){
@@ -296,10 +298,23 @@ public class Parser {
                             pushTextNode("[", false);
                         }
 
+
                         if(wholematch.startsWith("[/")){
-                            closeTagNode(tagname);
+                            if(!isCode || "code".equals(tagname)){
+                                closeTagNode(tagname);
+                            }
+                            if("code".equals(tagname)){
+                                isCode = false;
+                            }
                         }else{
-                            pushTagNode(tagname, parameter);
+                            if(isCode && !"code".equals(tagname)){
+                                pushTextNode(wholematch,false);
+                            }else if("code".equals(tagname)){
+                                isCode = true;
+                                pushTagNode(tagname, parameter);
+                            }else{
+                                pushTagNode(tagname, parameter);
+                            }
                         }
 
                         if(wholematch.endsWith("]]")){
