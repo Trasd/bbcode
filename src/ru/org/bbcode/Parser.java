@@ -45,6 +45,7 @@ public class Parser {
         BLOCK_LEVEL_TAGS.add("pre");
         BLOCK_LEVEL_TAGS.add("code");
         BLOCK_LEVEL_TAGS.add("div");
+        BLOCK_LEVEL_TAGS.add("cut");
 
         FLOW_TAGS = new HashSet<String>();
         FLOW_TAGS.addAll(INLINE_TAGS);
@@ -135,6 +136,11 @@ public class Parser {
             tag.setProhibitedElements(elements);
             TAGS.add(tag);
         }
+        {   // [cut]
+            CutTag tag = new CutTag("cut", FLOW_TAGS, null);
+            tag.setHtmlEquiv("div");
+            TAGS.add(tag);
+        }
         { //  <li>
             LiTag tag = new LiTag("*", FLOW_TAGS, "list");
             TAGS.add(tag);
@@ -163,8 +169,16 @@ public class Parser {
 
 
     protected boolean rootAllowsInline;
+    protected boolean renderCut;
+    protected String cutUrl;
     protected Node currentNode;
     protected Node rootNode;
+
+    public Parser(boolean renderCut, String cutUrl, boolean rootAllowsInline){
+        this.renderCut = renderCut;
+        this.cutUrl = cutUrl;
+        this.rootAllowsInline = rootAllowsInline;
+    }
 
     public Parser(boolean rootAllowsInline){
         this.rootAllowsInline = rootAllowsInline;
@@ -213,6 +227,7 @@ public class Parser {
     void pushTagNode(String name, String parameter){
         if(!currentNode.allows(name)){
             Tag newTag = TAG_DICT.get(name);
+
             if(newTag.isDiscardable()){
                 return;
             }else if(currentNode == rootNode || BLOCK_LEVEL_TAGS.contains(((TagNode)currentNode).getBbtag().getName()) && newTag.getImplicitTag() != null){
@@ -224,6 +239,9 @@ public class Parser {
             }
         }else{
             TagNode node = new TagNode(currentNode, name, parameter);
+            if("cut".equals(name)){
+                ((CutTag)(node.getBbtag())).setRenderOptions(renderCut, cutUrl);
+            }
             currentNode.getChildren().add(node);
             if(!node.getBbtag().isSelfClosing()){
                 descend();
