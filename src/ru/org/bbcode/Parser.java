@@ -1,5 +1,6 @@
 package ru.org.bbcode;
 
+import junit.framework.Test;
 import ru.org.bbcode.nodes.*;
 import ru.org.bbcode.tags.*;
 
@@ -24,10 +25,11 @@ public class Parser {
     public static List<Tag> TAGS;
     public static Map<String,Tag> TAG_DICT;
     public static Set<String> TAG_NAMES;
-    public static final Pattern MEMBER_REGEXP = Pattern.compile("^['\"]([0-9A-Za-z_]{1,30})['\"]$");
+
     public static final Pattern BBTAG_REGEXP = Pattern.compile("\\[\\[?/?([A-Za-z\\*]+)(:[a-f0-9]+)?(=[^\\]]+)?\\]?\\]");
     public static final Pattern URL_REGEXP = Pattern.compile("(\\w+)://([^\\s]+)");
-//    public static final Pattern BBTAG_REGEXP = Pattern.compile("\\[\\[?\\/?([A-Za-z\\*]+)(=[^\\]]+)?\\]?\\]");
+    public static final Pattern P_REGEXP = Pattern.compile("(\r?\n){2,}");
+
 
     static{
         INLINE_TAGS = new HashSet<String>();
@@ -233,10 +235,20 @@ public class Parser {
                 pushTextNode(text, false);
             }
         }else{
-            if(escaped){
-                currentNode.getChildren().add(new EscapedTextNode(currentNode,text));
+            Matcher matcher = P_REGEXP.matcher(text);
+
+            if(matcher.find()){
+                currentNode.getChildren().add(new TagNode(currentNode, "p", " "));
+                descend();
+                pushTextNode(text.substring(0, matcher.start()), false);
+                ascend();
+                pushTextNode(text.substring(matcher.end()), false);
             }else{
-                currentNode.getChildren().add(new TextNode(currentNode,text));
+                if(escaped){
+                    currentNode.getChildren().add(new EscapedTextNode(currentNode,text));
+                }else{
+                    currentNode.getChildren().add(new TextNode(currentNode,text));
+                }
             }
         }
     }
@@ -294,7 +306,7 @@ public class Parser {
     }
 
     protected String prepare(String bbcode){
-        return bbcode.replaceAll("\r\n", "\n").replaceAll("\n", "[softbr]");
+        return bbcode.replaceAll("\r\n", "\n").replaceAll("\n", "");
     }
 
     public void parse(String rawbbcode){
