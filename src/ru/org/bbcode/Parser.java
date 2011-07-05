@@ -302,6 +302,8 @@ public class Parser {
                         if(wholematch.startsWith("[/")){
                             if(!isCode || "code".equals(tagname)){
                                 closeTagNode(tagname);
+                            }else{
+                                pushTextNode(wholematch,false);
                             }
                             if("code".equals(tagname)){
                                 isCode = false;
