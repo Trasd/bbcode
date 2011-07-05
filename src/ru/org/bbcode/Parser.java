@@ -26,6 +26,7 @@ public class Parser {
     public static Set<String> TAG_NAMES;
     public static final Pattern MEMBER_REGEXP = Pattern.compile("^['\"]([0-9A-Za-z_]{1,30})['\"]$");
     public static final Pattern BBTAG_REGEXP = Pattern.compile("\\[\\[?/?([A-Za-z\\*]+)(:[a-f0-9]+)?(=[^\\]]+)?\\]?\\]");
+    public static final Pattern URL_REGEXP = Pattern.compile("(\\w+)://([^\\s]+)");
 //    public static final Pattern BBTAG_REGEXP = Pattern.compile("\\[\\[?\\/?([A-Za-z\\*]+)(=[^\\]]+)?\\]?\\]");
 
     static{
