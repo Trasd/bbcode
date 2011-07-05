@@ -25,8 +25,8 @@ public class Parser {
     public static Map<String,Tag> TAG_DICT;
     public static Set<String> TAG_NAMES;
     public static final Pattern MEMBER_REGEXP = Pattern.compile("^['\"]([0-9A-Za-z_]{1,30})['\"]$");
-//    public static final Pattern BBTAG_REGEXP = Pattern.compile("\\[\\[?/?([A-Za-z\\*]+)(:[a-f0-9]+)?(=[^\\]]+)?\\]?\\]");
-    public static final Pattern BBTAG_REGEXP = Pattern.compile("\\[\\[?\\/?([A-Za-z\\*]+)(=[^\\]]+)?\\]?\\]");
+    public static final Pattern BBTAG_REGEXP = Pattern.compile("\\[\\[?/?([A-Za-z\\*]+)(:[a-f0-9]+)?(=[^\\]]+)?\\]?\\]");
+//    public static final Pattern BBTAG_REGEXP = Pattern.compile("\\[\\[?\\/?([A-Za-z\\*]+)(=[^\\]]+)?\\]?\\]");
 
     static{
         INLINE_TAGS = new HashSet<String>();
@@ -263,7 +263,7 @@ public class Parser {
             if(match.find()){
                 pushTextNode(bbcode.substring(pos,match.start()), false);
                 String tagname = match.group(1);
-                String parameter = match.group(2);
+                String parameter = match.group(3);
                 String wholematch = match.group(0);
 
                 if(wholematch.startsWith("[[") && wholematch.endsWith("]]")){

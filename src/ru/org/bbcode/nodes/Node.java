@@ -45,10 +45,7 @@ public class Node {
     }
 
     public boolean isParameter(){
-        if(parameter == null){
-            return false;
-        }
-        return parameter.isEmpty();
+        return (parameter != null) && (parameter.length() > 0);
     }
 
     public String getParameter() {

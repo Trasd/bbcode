@@ -11,7 +11,6 @@ import ru.org.bbcode.tags.Tag;
  */
 public class TagNode extends Node{
     protected Tag bbtag;
-    protected String parameter;
 
     public TagNode(Node node, String name, String parameter){
         super(node);
