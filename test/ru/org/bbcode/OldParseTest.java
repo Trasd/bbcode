@@ -45,11 +45,4 @@ public class OldParseTest {
         Assert.assertEquals(parser.renderXHtml(), "<pre><code>&quot;code&amp;code&quot;</code></pre>");
     }
 
-    @Test
-    public void bbInListTest(){
-        Parser parser = new Parser(false);
-        parser.parse("[b][list=\"[/b]\"][/list]");
-        Assert.assertEquals(parser.renderXHtml(), "");
-    }
-
 }

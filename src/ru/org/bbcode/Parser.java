@@ -40,6 +40,7 @@ public class Parser {
         INLINE_TAGS.add("em");
         INLINE_TAGS.add("strong");
         INLINE_TAGS.add("url");
+        INLINE_TAGS.add("user");
         INLINE_TAGS.add("br");
         INLINE_TAGS.add("text");
         INLINE_TAGS.add("img");
@@ -113,6 +114,12 @@ public class Parser {
             Set<String> el = new HashSet<String>();
             el.add("text");
             UrlTag tag = new UrlTag("url", el, "div");
+            TAGS.add(tag);
+        }
+        { // <a> member
+            Set<String> el = new HashSet<String>();
+            el.add("text");
+            MemberTag tag = new MemberTag("user", el, "div");
             TAGS.add(tag);
         }
         { // <p>
@@ -192,6 +199,11 @@ public class Parser {
                 .replace("<","&lt;")
                 .replace(">","&gt;")
                 .replace("\"", "&quot;");
+    }
+
+    public static String getMemberLink(String name){
+        String pattern = "<span style=\"white-space: nowrap\"><img src=\"/img/tuxlor.png\"><a style=\"text-decoration: none\" href='/people/%s/profile'>%s</a></span>";
+        return String.format(pattern, name, name); // TODO
     }
 
 

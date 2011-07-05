@@ -89,6 +89,12 @@ public class SimpleParserTest {
         parser.parse("[code][list][*]one[*]two[*]three[/list][/code]");
         Assert.assertEquals(parser.renderXHtml(),"<pre><code>[list][*]one[*]two[*]three[/list]</code></pre>");
     }
+    @Test
+    public void userTest(){
+        Parser parser = new Parser(false);
+        parser.parse("[user]maxcom[/user]");
+        Assert.assertEquals(parser.renderXHtml(),"<div><span style=\"white-space: nowrap\"><img src=\"/img/tuxlor.png\"><a style=\"text-decoration: none\" href='/people/maxcom/profile'>maxcom</a></span></div>");
+    }
 
 
 }
