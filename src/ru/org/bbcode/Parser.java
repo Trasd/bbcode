@@ -313,7 +313,7 @@ public class Parser {
     }
 
     public RootNode parse(String rawbbcode){
-        return parse(rawbbcode, false, "");
+        return parse(rawbbcode, true, "");
 
     }
 
