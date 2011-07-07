@@ -1,6 +1,5 @@
 package ru.org.bbcode;
 
-import junit.framework.Test;
 import ru.org.bbcode.nodes.*;
 import ru.org.bbcode.tags.*;
 
@@ -209,16 +208,6 @@ public class Parser {
 
 
     protected boolean rootAllowsInline;
-    protected boolean renderCut;
-    protected String cutUrl;
-    protected Node currentNode;
-    protected Node rootNode;
-
-    public Parser(boolean renderCut, String cutUrl, boolean rootAllowsInline){
-        this.renderCut = renderCut;
-        this.cutUrl = cutUrl;
-        this.rootAllowsInline = rootAllowsInline;
-    }
 
     public Parser(boolean rootAllowsInline){
         this.rootAllowsInline = rootAllowsInline;
@@ -228,7 +217,7 @@ public class Parser {
         this.rootAllowsInline = false;
     }
 
-    void pushTextNode(String text, boolean escaped){
+    private Node pushTextNode(Node currentNode, String text, boolean escaped){
 
         if(!currentNode.allows("text")){
             if(text.trim().length() == 0){
@@ -240,21 +229,21 @@ public class Parser {
             }else{
                 if(currentNode.allows("div")){
                     currentNode.getChildren().add(new TagNode(currentNode,"div", ""));
-                    descend();
+                    currentNode = descend(currentNode);
                 }else{
-                    ascend();
+                    currentNode = ascend(currentNode);
                 }
-                pushTextNode(text, false);
+                currentNode = pushTextNode(currentNode, text, false);
             }
         }else{
             Matcher matcher = P_REGEXP.matcher(text);
 
             if(matcher.find()){
                 currentNode.getChildren().add(new TagNode(currentNode, "p", " "));
-                descend();
-                pushTextNode(text.substring(0, matcher.start()), false);
-                ascend();
-                pushTextNode(text.substring(matcher.end()), false);
+                currentNode = descend(currentNode);
+                currentNode = pushTextNode(currentNode, text.substring(0, matcher.start()), false);
+                currentNode = ascend(currentNode);
+                currentNode = pushTextNode(currentNode, text.substring(matcher.end()), false);
             }else{
                 if(escaped){
                     currentNode.getChildren().add(new EscapedTextNode(currentNode,text));
@@ -263,29 +252,29 @@ public class Parser {
                 }
             }
         }
+        return currentNode;
     }
 
-    void descend(){
-        currentNode = currentNode.getChildren().get(currentNode.getChildren().size()-1);
+    private Node descend(Node currentNode){
+        return currentNode.getChildren().get(currentNode.getChildren().size()-1);
     }
 
-    void ascend(){
-        currentNode = currentNode.getParent();
-
+    private Node ascend(Node currentNode){
+        return currentNode.getParent();
     }
 
-    void pushTagNode(String name, String parameter){
+    private Node pushTagNode(RootNode rootNode, Node currentNode, String name, String parameter, boolean renderCut, String cutUrl){
         if(!currentNode.allows(name)){
             Tag newTag = TAG_DICT.get(name);
 
             if(newTag.isDiscardable()){
-                return;
+                return currentNode;
             }else if(currentNode == rootNode || BLOCK_LEVEL_TAGS.contains(((TagNode)currentNode).getBbtag().getName()) && newTag.getImplicitTag() != null){
-                pushTagNode(newTag.getImplicitTag(), "");
-                pushTagNode(name, parameter);
+                currentNode = pushTagNode(rootNode, currentNode, newTag.getImplicitTag(), "", renderCut, cutUrl);
+                currentNode = pushTagNode(rootNode, currentNode, name, parameter, renderCut, cutUrl);
             }else{
                 currentNode = currentNode.getParent();
-                pushTagNode(name, parameter);
+                currentNode = pushTagNode(rootNode, currentNode, name, parameter, renderCut, cutUrl);
             }
         }else{
             TagNode node = new TagNode(currentNode, name, parameter);
@@ -294,12 +283,13 @@ public class Parser {
             }
             currentNode.getChildren().add(node);
             if(!node.getBbtag().isSelfClosing()){
-                descend();
+                currentNode = descend(currentNode);
             }
         }
+        return currentNode;
     }
 
-    void closeTagNode(String name){
+    private Node closeTagNode(RootNode rootNode, Node currentNode, String name){
         Node tempNode = currentNode;
         while (true){
             if(tempNode == rootNode){
@@ -309,85 +299,91 @@ public class Parser {
                 TagNode node = (TagNode)tempNode;
                 if(node.getBbtag().getName().equals(name)){
                     currentNode = tempNode;
-                    ascend();
+                    currentNode = ascend(currentNode);
                     break;
                 }
             }
             tempNode = tempNode.getParent();
         }
+        return currentNode;
     }
 
     protected String prepare(String bbcode){
         return bbcode.replaceAll("\r\n", "\n").replaceAll("\n", "");
     }
 
-    public void parse(String rawbbcode){
-        rootNode = new RootNode(rootAllowsInline);
-        currentNode = rootNode;
+    public RootNode parse(String rawbbcode){
+        return parse(rawbbcode, false, "");
+
+    }
+
+    public RootNode parse(String rawbbcode, boolean renderCut, String cutUrl){
+        RootNode rootNode = new RootNode(rootAllowsInline);
+        Node currentNode = rootNode;
         String bbcode = rawbbcode;
         int pos = 0;
         boolean isCode = false;
         while(pos<bbcode.length()){
             Matcher match = BBTAG_REGEXP.matcher(bbcode).region(pos,bbcode.length());
             if(match.find()){
-                pushTextNode(bbcode.substring(pos,match.start()), false);
+                currentNode = pushTextNode(currentNode, bbcode.substring(pos,match.start()), false);
                 String tagname = match.group(1);
                 String parameter = match.group(3);
                 String wholematch = match.group(0);
 
                 if(wholematch.startsWith("[[") && wholematch.endsWith("]]")){
-                    pushTextNode(wholematch.substring(1,wholematch.length()-1), true);
+                    currentNode = pushTextNode(currentNode, wholematch.substring(1,wholematch.length()-1), true);
                 }else{
                     if(parameter != null && parameter.length() > 0){
                         parameter = parameter.substring(1);
                     }
                     if(TAG_NAMES.contains(tagname)){
                         if(wholematch.startsWith("[[")){
-                            pushTextNode("[", false);
+                            currentNode = pushTextNode(currentNode, "[", false);
                         }
 
 
                         if(wholematch.startsWith("[/")){
                             if(!isCode || "code".equals(tagname)){
-                                closeTagNode(tagname);
+                                currentNode = closeTagNode(rootNode, currentNode, tagname);
                             }else{
-                                pushTextNode(wholematch,false);
+                                currentNode = pushTextNode(currentNode, wholematch,false);
                             }
                             if("code".equals(tagname)){
                                 isCode = false;
                             }
                         }else{
                             if(isCode && !"code".equals(tagname)){
-                                pushTextNode(wholematch,false);
+                                currentNode = pushTextNode(currentNode, wholematch,false);
                             }else if("code".equals(tagname)){
                                 isCode = true;
-                                pushTagNode(tagname, parameter);
+                                currentNode = pushTagNode(rootNode, currentNode, tagname, parameter, renderCut, cutUrl);
                             }else{
-                                pushTagNode(tagname, parameter);
+                                currentNode = pushTagNode(rootNode, currentNode, tagname, parameter, renderCut, cutUrl);
                             }
                         }
 
                         if(wholematch.endsWith("]]")){
-                            pushTextNode("]", false);
+                            currentNode = pushTextNode(currentNode, "]", false);
                         }
                     }else{
-                        pushTextNode(wholematch, false);
+                        currentNode = pushTextNode(currentNode, wholematch, false);
                     }
                 }
                 pos = match.end();
             }else{
-                pushTextNode(bbcode.substring(pos),false);
+                currentNode = pushTextNode(currentNode, bbcode.substring(pos),false);
                 pos = bbcode.length();
             }
         }
-
+        return rootNode;
     }
 
-    public String renderXHtml(){
+    public String renderXHtml(RootNode rootNode){
         return rootNode.renderXHtml();
     }
 
-    public String renderBBCode(){
+    public String renderBBCode(RootNode rootNode){
         return rootNode.renderBBCode();
     }
 

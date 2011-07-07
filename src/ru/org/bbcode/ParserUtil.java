@@ -10,22 +10,18 @@ import java.io.*;
  */
 public class ParserUtil {
 
+    private static final Parser parser = new Parser();
+
     public static String bb2xhtml(String bbcode, boolean rootAllowsInline){
-        Parser parser = new Parser(rootAllowsInline);
-        parser.parse(bbcode);
-        return parser.renderXHtml();
+        return parser.parse(bbcode).renderXHtml();
     }
 
     public static String bb2xhtml(String bbcode, boolean rootAllowsInline, boolean renderCut, String cutUrl){
-        Parser parser = new Parser(renderCut, cutUrl, rootAllowsInline);
-        parser.parse(bbcode);
-        return parser.renderXHtml();
+        return parser.parse(bbcode, renderCut, cutUrl).renderXHtml();
     }
 
     public static String correct(String bbcode, boolean rootAllowsInline){
-        Parser parser = new Parser(rootAllowsInline);
-        parser.parse(bbcode);
-        return parser.renderBBCode();
+        return parser.parse(bbcode).renderBBCode();
     }
 
     public static String to_html(String text){

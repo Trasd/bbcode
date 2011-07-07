@@ -10,91 +10,61 @@ import org.junit.Test;
  * Time: 5:06 PM
  */
 public class SimpleParserTest {
-    @Test
-    public void firstTest() {
-        Parser parser = new Parser(false);
-        Assert.assertNotNull(parser);
-    }
+    private final Parser parser = new Parser();
 
     @Test
     public void brTest(){
-        Parser parser = new Parser(false);
-        parser.parse("[br]");
-        Assert.assertEquals(parser.renderXHtml(), "<div><br/></div>");
+        Assert.assertEquals(parser.parse("[br]").renderXHtml(), "<div><br/></div>");
     }
 
     @Test
     public void boldTest(){
-        Parser parser = new Parser(false);
-        parser.parse("[b]hello world[/b]");
-        Assert.assertEquals(parser.renderXHtml(),"<div><b>hello world</b></div>");
+        Assert.assertEquals(parser.parse("[b]hello world[/b]").renderXHtml(), "<div><b>hello world</b></div>");
     }
 
     @Test
     public void italicTest(){
-        Parser parser = new Parser(false);
-        parser.parse("[i]hello world[/i]");
-        Assert.assertEquals(parser.renderXHtml(),"<div><i>hello world</i></div>");
+        Assert.assertEquals(parser.parse("[i]hello world[/i]").renderXHtml(), "<div><i>hello world</i></div>");
     }
 
     @Test
     public void strikeoutTest(){
-        Parser parser = new Parser(false);
-        parser.parse("[s]hello world[/s]");
-        Assert.assertEquals(parser.renderXHtml(),"<div><s>hello world</s></div>");
+        Assert.assertEquals(parser.parse("[s]hello world[/s]").renderXHtml(), "<div><s>hello world</s></div>");
     }
 
     @Test
     public void emphasisTest(){
-        Parser parser = new Parser(false);
-        parser.parse("[strong]hello world[/strong]");
-        Assert.assertEquals(parser.renderXHtml(),"<div><strong>hello world</strong></div>");
+        Assert.assertEquals(parser.parse("[strong]hello world[/strong]").renderXHtml(), "<div><strong>hello world</strong></div>");
     }
 
     @Test
     public void quoteTest(){
-        Parser parser = new Parser(false);
-        parser.parse("[quote]hello world[/quote]");
         // TODO я нрипонял зачем <div> :-(
-        Assert.assertEquals(parser.renderXHtml(),"<blockquote><div>hello world</div></blockquote>");
+        Assert.assertEquals(parser.parse("[quote]hello world[/quote]").renderXHtml(), "<blockquote><div>hello world</div></blockquote>");
     }
     @Test
     public void quoteParamTest(){
-        Parser parser = new Parser(false);
-        parser.parse("[quote=maxcom]hello world[/quote]");
         // TODO я нрипонял зачем <div> :-(
-        Assert.assertEquals(parser.renderXHtml(),"<p class=\"cite\"><cite>maxcom:</cite></p><blockquote><div>hello world</div></blockquote>");
+        Assert.assertEquals(parser.parse("[quote=maxcom]hello world[/quote]").renderXHtml(), "<p class=\"cite\"><cite>maxcom:</cite></p><blockquote><div>hello world</div></blockquote>");
     }
     @Test
     public void urlTest(){
-        Parser parser = new Parser(false);
-        parser.parse("[url]http://linux.org.ru[/url]");
-        Assert.assertEquals(parser.renderXHtml(),"<div><a href=\"http://linux.org.ru\">http://linux.org.ru</a></div>");
+        Assert.assertEquals(parser.parse("[url]http://linux.org.ru[/url]").renderXHtml(), "<div><a href=\"http://linux.org.ru\">http://linux.org.ru</a></div>");
     }
     @Test
     public void urlParamTest(){
-        Parser parser = new Parser(false);
-        parser.parse("[url=http://linux.org.ru]linux[/url]");
-        Assert.assertEquals(parser.renderXHtml(),"<div><a href=\"http://linux.org.ru\">linux</a></div>");
+        Assert.assertEquals(parser.parse("[url=http://linux.org.ru]linux[/url]").renderXHtml(), "<div><a href=\"http://linux.org.ru\">linux</a></div>");
     }
     @Test
     public void listTest(){
-        Parser parser = new Parser(false);
-        parser.parse("[list][*]one[*]two[*]three[/list]");
-        Assert.assertEquals(parser.renderXHtml(),"<ul><li>one</li><li>two</li><li>three</li></ul>");
+        Assert.assertEquals(parser.parse("[list][*]one[*]two[*]three[/list]").renderXHtml(), "<ul><li>one</li><li>two</li><li>three</li></ul>");
     }
     @Test
     public void codeTest(){
-        Parser parser = new Parser(false);
-        parser.parse("[code][list][*]one[*]two[*]three[/list][/code]");
-        Assert.assertEquals(parser.renderXHtml(),"<pre><code>[list][*]one[*]two[*]three[/list]</code></pre>");
+        Assert.assertEquals(parser.parse("[code][list][*]one[*]two[*]three[/list][/code]").renderXHtml(), "<pre><code>[list][*]one[*]two[*]three[/list]</code></pre>");
     }
     @Test
     public void userTest(){
-        Parser parser = new Parser(false);
-        parser.parse("[user]maxcom[/user]");
-        Assert.assertEquals(parser.renderXHtml(),"<div><span style=\"white-space: nowrap\"><img src=\"/img/tuxlor.png\"><a style=\"text-decoration: none\" href='/people/maxcom/profile'>maxcom</a></span></div>");
+        Assert.assertEquals(parser.parse("[user]maxcom[/user]").renderXHtml(), "<div><span style=\"white-space: nowrap\"><img src=\"/img/tuxlor.png\"><a style=\"text-decoration: none\" href='/people/maxcom/profile'>maxcom</a></span></div>");
     }
-
-
 }
