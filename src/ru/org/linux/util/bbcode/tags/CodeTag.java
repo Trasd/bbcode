@@ -36,11 +36,10 @@
  * E-mail: <hizel@vyborg.ru>
  */
 
-package ru.org.bbcode.tags;
+package ru.org.linux.util.bbcode.tags;
 
-import ru.org.bbcode.Parser;
-import ru.org.bbcode.nodes.Node;
-import ru.org.bbcode.nodes.TextNode;
+import ru.org.linux.util.bbcode.Parser;
+import ru.org.linux.util.bbcode.nodes.Node;
 
 import java.util.Set;
 
@@ -48,33 +47,22 @@ import java.util.Set;
  * Created by IntelliJ IDEA.
  * User: hizel
  * Date: 6/30/11
- * Time: 12:20 PM
+ * Time: 1:00 PM
  */
-public class UrlTag extends Tag {
-    public UrlTag(String name, Set<String> allowedChildren, String implicitTag){
+public class CodeTag extends Tag{
+    public CodeTag(String name, Set<String> allowedChildren, String implicitTag){
         super(name, allowedChildren, implicitTag);
     }
     public String renderNodeXhtml(Node node){
         StringBuilder ret = new StringBuilder();
-        String url;
-        if(node.lengthChildren() == 0){
-            return "";
-        }
-        TextNode txtNode = (TextNode)node.getChildren().iterator().next();
         if(node.isParameter()){
-            url = node.getParameter().trim();
+            String lang = node.getParameter().trim();
+            ret.append("<pre class=\"language-").append(Parser.escape(lang)).append("\"><code>");
         }else{
-            url = txtNode.getText().trim();
+            ret.append("<pre><code>");
         }
-        String linkText = txtNode.getText().trim();
-        if(url.length() != 0){
-            ret.append("<a href=\"");
-            ret.append(Parser.escape(url));
-            ret.append("\">");
-            ret.append(Parser.escape(linkText));
-            ret.append("</a>");
-        }
+        ret.append(node.renderChildrenXHtml());
+        ret.append("</code></pre>");
         return ret.toString();
     }
-
 }

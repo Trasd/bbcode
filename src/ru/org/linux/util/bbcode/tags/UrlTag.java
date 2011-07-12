@@ -36,37 +36,45 @@
  * E-mail: <hizel@vyborg.ru>
  */
 
-package ru.org.bbcode.nodes;
+package ru.org.linux.util.bbcode.tags;
 
-import ru.org.bbcode.Parser;
+import ru.org.linux.util.bbcode.Parser;
+import ru.org.linux.util.bbcode.nodes.Node;
+import ru.org.linux.util.bbcode.nodes.TextNode;
+
+import java.util.Set;
 
 /**
  * Created by IntelliJ IDEA.
  * User: hizel
  * Date: 6/30/11
- * Time: 3:01 PM
+ * Time: 12:20 PM
  */
-public class RootNode extends Node{
-    protected boolean allowInline;
-
-    public RootNode(boolean allowInline){
-        super();
-        this.allowInline = allowInline;
+public class UrlTag extends Tag {
+    public UrlTag(String name, Set<String> allowedChildren, String implicitTag){
+        super(name, allowedChildren, implicitTag);
     }
-
-    public String renderXHtml(){
-        return renderChildrenXHtml();
-    }
-
-    public boolean allows(String tagname){
-        if(allowInline){
-            return Parser.FLOW_TAGS.contains(tagname);
-        }else{
-            return Parser.BLOCK_LEVEL_TAGS.contains(tagname);
+    public String renderNodeXhtml(Node node){
+        StringBuilder ret = new StringBuilder();
+        String url;
+        if(node.lengthChildren() == 0){
+            return "";
         }
+        TextNode txtNode = (TextNode)node.getChildren().iterator().next();
+        if(node.isParameter()){
+            url = node.getParameter().trim();
+        }else{
+            url = txtNode.getText().trim();
+        }
+        String linkText = txtNode.getText().trim();
+        if(url.length() != 0){
+            ret.append("<a href=\"");
+            ret.append(Parser.escape(url));
+            ret.append("\">");
+            ret.append(Parser.escape(linkText));
+            ret.append("</a>");
+        }
+        return ret.toString();
     }
 
-    public String renderBBCode(){
-        return renderChildrenBBCode();
-    }
 }

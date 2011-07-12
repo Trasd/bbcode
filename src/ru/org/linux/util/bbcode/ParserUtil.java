@@ -1,4 +1,4 @@
-package ru.org.bbcode;
+package ru.org.linux.util.bbcode;
 
 import java.io.*;
 

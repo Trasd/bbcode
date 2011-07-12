@@ -36,9 +36,9 @@
  * E-mail: <hizel@vyborg.ru>
  */
 
-package ru.org.bbcode.tags;
+package ru.org.linux.util.bbcode.tags;
 
-import ru.org.bbcode.nodes.Node;
+import ru.org.linux.util.bbcode.nodes.Node;
 
 import java.util.Set;
 

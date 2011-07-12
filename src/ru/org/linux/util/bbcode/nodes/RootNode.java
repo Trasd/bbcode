@@ -36,30 +36,37 @@
  * E-mail: <hizel@vyborg.ru>
  */
 
-package ru.org.bbcode.tags;
+package ru.org.linux.util.bbcode.nodes;
 
-import ru.org.bbcode.nodes.Node;
-
-import java.util.Set;
+import ru.org.linux.util.bbcode.Parser;
 
 /**
  * Created by IntelliJ IDEA.
  * User: hizel
  * Date: 6/30/11
- * Time: 11:45 AM
+ * Time: 3:01 PM
  */
-public class SoftBrTag extends Tag {
-    public SoftBrTag(String name, Set<String> allowedChildren, String implicitTag){
-        super(name, allowedChildren, implicitTag);
+public class RootNode extends Node{
+    protected boolean allowInline;
+
+    public RootNode(boolean allowInline){
+        super();
+        this.allowInline = allowInline;
     }
-    public String renderNodeXhtml(Node node){
-        if(node.getParent().allows("br")){
-            return "<br/>";
+
+    public String renderXHtml(){
+        return renderChildrenXHtml();
+    }
+
+    public boolean allows(String tagname){
+        if(allowInline){
+            return Parser.FLOW_TAGS.contains(tagname);
         }else{
-            return "\n";
+            return Parser.BLOCK_LEVEL_TAGS.contains(tagname);
         }
     }
-    public String renderNodeBBCode(Node node){
-        return "\n";
+
+    public String renderBBCode(){
+        return renderChildrenBBCode();
     }
 }

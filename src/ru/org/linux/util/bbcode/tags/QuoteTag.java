@@ -36,67 +36,43 @@
  * E-mail: <hizel@vyborg.ru>
  */
 
-package ru.org.bbcode.nodes;
+package ru.org.linux.util.bbcode.tags;
 
-import ru.org.bbcode.Parser;
+import ru.org.linux.util.bbcode.Parser;
+import ru.org.linux.util.bbcode.nodes.Node;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.regex.Matcher;
+import java.util.Set;
 
 /**
  * Created by IntelliJ IDEA.
  * User: hizel
  * Date: 6/30/11
- * Time: 11:57 AM
- * To change this template use File | Settings | File Templates.
+ * Time: 12:34 PM
  */
-public class TextNode extends Node {
-    protected String text;
-
-    public TextNode(Node parent, String text){
-        super(parent);
-        this.text = text;
+public class QuoteTag extends Tag {
+    public QuoteTag(String name, Set<String> allowedChildren, String implicitTag){
+        super(name, allowedChildren, implicitTag);
     }
-
-    public String getText() {
-        return text;
-    }
-
-    public String renderXHtml(){
-        Matcher match = Parser.URL_REGEXP.matcher(text);
+    public String renderNodeXhtml(Node node){
         StringBuilder ret = new StringBuilder();
-        int pos = 0;
-        while(match.find()){
-            String url = match.group(2);
-            String uri_type = Parser.escape(match.group(1));
-            String url_encoded = "unsuported encode utf-8 :-(";
-            try{
-                url_encoded = URLEncoder.encode(url, "UTF-8");
-            }catch(UnsupportedEncodingException ex){
-                // TODO как это нет UTF-8 кодировки оО
-            }
-
-            ret.append(Parser.escape(text.substring(pos, match.start())));
-            ret.append("<a href=\"")
-                    .append(uri_type)
-                    .append("://")
-                    .append(url_encoded)
-                    .append("\">")
-                    .append(Parser.escape(url))
-                    .append("</a>");
-            pos = match.end();
+        if(!node.isParameter()){
+            node.setParameter("");
+        }else{
+            node.setParameter(node.getParameter().trim());
         }
-        ret.append(Parser.escape(text.substring(pos)));
 
+        if(!node.getParameter().isEmpty()){
+            ret.append("<p class=\"cite\"><cite>");
+            ret.append(Parser.escape(node.getParameter()));
+            ret.append(":</cite></p>");
+            ret.append("<blockquote>");
+            ret.append(node.renderChildrenXHtml());
+            ret.append("</blockquote>");
+        }else{
+            ret.append("<blockquote>");
+            ret.append(node.renderChildrenXHtml());
+            ret.append("</blockquote>");
+        }
         return ret.toString();
-    }
-
-    public String renderBBCode(){
-        return text;
-    }
-
-    public boolean allows(String tagname){
-        return false;
     }
 }

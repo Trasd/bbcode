@@ -36,10 +36,10 @@
  * E-mail: <hizel@vyborg.ru>
  */
 
-package ru.org.bbcode;
+package ru.org.linux.util.bbcode;
 
-import ru.org.bbcode.nodes.*;
-import ru.org.bbcode.tags.*;
+import ru.org.linux.util.bbcode.nodes.*;
+import ru.org.linux.util.bbcode.tags.*;
 
 import java.util.*;
 import java.util.regex.Matcher;

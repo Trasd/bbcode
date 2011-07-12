@@ -36,33 +36,56 @@
  * E-mail: <hizel@vyborg.ru>
  */
 
-package ru.org.bbcode.tags;
+package ru.org.linux.util.bbcode.nodes;
 
-import ru.org.bbcode.Parser;
-import ru.org.bbcode.nodes.Node;
-
-import java.util.Set;
+import ru.org.linux.util.bbcode.Parser;
+import ru.org.linux.util.bbcode.tags.Tag;
 
 /**
  * Created by IntelliJ IDEA.
  * User: hizel
  * Date: 6/30/11
- * Time: 1:00 PM
+ * Time: 3:09 PM
  */
-public class CodeTag extends Tag{
-    public CodeTag(String name, Set<String> allowedChildren, String implicitTag){
-        super(name, allowedChildren, implicitTag);
+public class TagNode extends Node{
+    protected Tag bbtag;
+
+    public TagNode(Node node, String name, String parameter){
+        super(node);
+        bbtag = Parser.TAG_DICT.get(name);
+        this.parameter = parameter;
     }
-    public String renderNodeXhtml(Node node){
-        StringBuilder ret = new StringBuilder();
-        if(node.isParameter()){
-            String lang = node.getParameter().trim();
-            ret.append("<pre class=\"language-").append(Parser.escape(lang)).append("\"><code>");
+
+    public boolean prohibited(String tagName){
+        if(bbtag.getProhibitedElements() != null && bbtag.getProhibitedElements().contains(tagName)){
+            return true;
         }else{
-            ret.append("<pre><code>");
+            if(parent == null){
+                return false;
+            }else{
+                return parent.prohibited(tagName);
+            }
         }
-        ret.append(node.renderChildrenXHtml());
-        ret.append("</code></pre>");
-        return ret.toString();
     }
+    public boolean allows(String tagName){
+        if(bbtag.getAllowedChildren().contains(tagName)){
+            return !prohibited(tagName);
+        }else{
+            return false;
+        }
+    }
+
+    public Tag getBbtag() {
+        return bbtag;
+    }
+
+    public String renderXHtml(){
+        return bbtag.renderNodeXhtml(this);
+    }
+
+    public String renderBBCode(){
+        return bbtag.renderNodeBBCode(this);
+    }
+
+
 }

@@ -36,23 +36,30 @@
  * E-mail: <hizel@vyborg.ru>
  */
 
-package ru.org.bbcode.nodes;
+package ru.org.linux.util.bbcode.tags;
+
+import ru.org.linux.util.bbcode.nodes.Node;
+
+import java.util.Set;
 
 /**
  * Created by IntelliJ IDEA.
  * User: hizel
  * Date: 6/30/11
- * Time: 3:06 PM
- * To change this template use File | Settings | File Templates.
+ * Time: 11:45 AM
  */
-public class EscapedTextNode extends TextNode{
-    public EscapedTextNode(Node node, String text){
-        super(node, text);
+public class SoftBrTag extends Tag {
+    public SoftBrTag(String name, Set<String> allowedChildren, String implicitTag){
+        super(name, allowedChildren, implicitTag);
     }
-
-    public String renderBBCode(){
-        StringBuilder ret = new StringBuilder();
-        ret.append('[').append(text).append(']');
-        return ret.toString();
+    public String renderNodeXhtml(Node node){
+        if(node.getParent().allows("br")){
+            return "<br/>";
+        }else{
+            return "\n";
+        }
+    }
+    public String renderNodeBBCode(Node node){
+        return "\n";
     }
 }
