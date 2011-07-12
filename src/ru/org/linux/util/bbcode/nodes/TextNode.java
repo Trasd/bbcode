@@ -40,10 +40,6 @@ package ru.org.linux.util.bbcode.nodes;
 
 import ru.org.linux.util.bbcode.Parser;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.regex.Matcher;
-
 /**
  * Created by IntelliJ IDEA.
  * User: hizel
@@ -64,32 +60,7 @@ public class TextNode extends Node {
     }
 
     public String renderXHtml(){
-        Matcher match = Parser.URL_REGEXP.matcher(text);
-        StringBuilder ret = new StringBuilder();
-        int pos = 0;
-        while(match.find()){
-            String url = match.group(2);
-            String uri_type = Parser.escape(match.group(1));
-            String url_encoded = "unsuported encode utf-8 :-(";
-            try{
-                url_encoded = URLEncoder.encode(url, "UTF-8");
-            }catch(UnsupportedEncodingException ex){
-                // TODO как это нет UTF-8 кодировки оО
-            }
-
-            ret.append(Parser.escape(text.substring(pos, match.start())));
-            ret.append("<a href=\"")
-                    .append(uri_type)
-                    .append("://")
-                    .append(url_encoded)
-                    .append("\">")
-                    .append(Parser.escape(url))
-                    .append("</a>");
-            pos = match.end();
-        }
-        ret.append(Parser.escape(text.substring(pos)));
-
-        return ret.toString();
+        return Parser.escape(text);
     }
 
     public String renderBBCode(){
